@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#0d1b2a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>KKM Vegetable</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" href="icons/icon-192.png"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0d1b2a;min-height:100vh;font-family:Arial,sans-serif;color:#e8f4fd}
+input,select,button{font-family:Arial,sans-serif}
+.app{background:#0d1b2a;min-height:100vh}
+.hdr{background:linear-gradient(135deg,#0a3d2a,#0d1b2a);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1a3450}
+.card{background:#112236;border-radius:10px;border:1px solid #1a3450;margin-bottom:12px;overflow:hidden}
+.card-h{padding:11px 14px;border-bottom:1px solid #1a3450;display:flex;justify-content:space-between;align-items:center}
+.irow{display:flex;align-items:center;padding:8px 14px;border-bottom:1px solid #1a3450;gap:8px}
+.tabs{display:flex;background:#0a1824;border-bottom:1px solid #1a3450;overflow-x:auto}
+.tab{padding:12px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;background:none;border:none;border-bottom:2px solid transparent;color:#5a7a94}
+.tab.active{border-bottom:2px solid #00d68f;color:#00d68f}
+.inp{width:100%;background:#0d2035;border:1px solid #1a3450;border-radius:8px;padding:10px 12px;color:#e8f4fd;font-size:14px;outline:none;box-sizing:border-box;margin-bottom:12px}
+.sel{width:100%;background:#0d2035;border:1px solid #1a3450;border-radius:8px;padding:10px 12px;color:#e8f4fd;font-size:14px;outline:none;box-sizing:border-box;margin-bottom:12px}
+.btn{background:#00d68f;color:#000;border:none;border-radius:8px;padding:11px 16px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-top:4px}
+.btn.blue{background:#4dabf7;color:#fff}
+.btn.red{background:#1a3450;color:#fff}
+.btn.green{background:#25D366;color:#fff}
+.btn.orange{background:#ff6b35;color:#fff}
+.bsm{border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;background:#00d68f;color:#000}
+.bsm.dark{background:#1a3450;color:#fff}
+.bsm.dis{background:#1a3450;color:#fff;opacity:0.45;cursor:default}
+.bdg{border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700}
+.bdg.green{background:#00d68f22;color:#00d68f}
+.bdg.yellow{background:#ffc10722;color:#ffc107}
+.bdg.red{background:#ff4d4d22;color:#ff4d4d}
+.sec{padding:14px}
+.dbar{background:#0d2035;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.code{background:#060f18;border:1px solid #1a3450;border-radius:8px;padding:14px;font-family:monospace;font-size:11px;color:#00d68f;white-space:pre-wrap;line-height:1.7;overflow-x:auto}
+.iinp{width:60px;background:#0d2035;border:1px solid #1a3450;border-radius:6px;padding:5px 8px;color:#00d68f;font-size:13px;outline:none;text-align:right}
+.usel{width:54px;background:#0d2035;border:1px solid #1a3450;border-radius:6px;padding:5px 4px;color:#5a7a94;font-size:11px;outline:none;margin-left:3px}
+.pin-dots{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:#1a3450;transition:all .2s}
+.pin-dot.filled{background:#00d68f}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pin-key{background:#0d2035;border:1px solid #1a3450;border-radius:10px;padding:14px 0;font-size:18px;font-weight:700;color:#e8f4fd;cursor:pointer;text-align:center;width:100%}
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.lcard{background:#112236;border-radius:16px;padding:28px;width:100%;max-width:340px;border:1px solid #1a3450}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:8px 10px;text-align:left;color:#5a7a94;font-weight:700;font-size:11px;border-bottom:1px solid #1a3450;text-transform:uppercase}
+.tbl td{padding:8px 10px;border-bottom:1px solid #1a3450;font-size:12px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+var ADMIN_PIN = "0000";
+var PURCHASER_PIN = "9210";
+var OWNER_PIN = "5865";
+var SUPPLIER = {name:"Kumarankundram Vegetables And Fruits",address:"K75, Vegetable Market, Koyambedu"};
+var BRANCH_PINS = {"Hasthinapuram":"1111","Tambaram":"2222","Pammal":"3333","Pazhavanthangal":"4444","Keelkatalai":"5555","Perumbakkam":"6666","Taramani":"7777","Ekkattuthangal":"8888","Mugalivakkam":"9999","3 Bar":"1234","Central Kitchen":"5678"};
+
+// Default units per item
+var ITEM_UNITS = {
+  "Cauliflower":"bora","Onion":"bora","Potato":"bora",
+  "Mushroom":"pkt","Baby Corn":"pcs","Sweet Corn":"pcs",
+  "Kiwi":"pcs","Strawberry":"pcs","Pineapple":"pcs",
+  "Watermelon":"pcs","Muskmelon":"pcs","Pomegranate":"pcs",
+  "Banana Leaf":"pcs","Nariyal":"pcs","Raw Banana":"pcs",
+  "Mango":"kg","Apple":"kg","Sweet Lime":"kg","Orange":"kg",
+  "Papaya":"kg","Amla":"kg","Fig":"kg","Kai Mango":"kg",
+};
+function defaultUnit(item){ return ITEM_UNITS[item]||"kg"; }
+var UNITS = ["kg","g","bora","pcs","pkt","nos","ltr","box"];
+var BRANCHES = Object.keys(BRANCH_PINS);
+var ITEMS = ["Tomato","Onion","Potato","Cauliflower","Cabbage","Capsicum","Green Chilli","Carrot","Beans","Bhindi","Cucumber","Lemon","Ginger","Garlic","Karamani","Sorakai","Salary Leaf","Staff Veg","Spring Onion","Palak","Malli","Pudina","Mushroom","Baby Corn","Sweet Corn","Murunga","Beetroot","Raw Banana","Banana Leaf","Nariyal","Radish","Mulangi","Carrypatta","Big Garlic","Bitter Guard","Brinjal","Bhajji Chilli","Pumpkin","Apple","Sweet Lime","Pineapple","Watermelon","Mango","Amla","Pomegranate","Orange","Papaya","Kiwi","Muskmelon","Fig","Kai Mango"];
+var FRUITS=["Apple","Sweet Lime","Pineapple","Watermelon","Mango","Amla","Pomegranate","Orange","Papaya","Kiwi","Muskmelon","Fig","Kai Mango"];
+var OPC=["Onion","Potato","Cauliflower"];
+var SP=["Spring Onion","Palak"];
+var MP=["Malli","Pudina"];
+var MBC=["Mushroom","Baby Corn"];
+var OVEXCL=OPC.concat(SP,MP,MBC,FRUITS,["Tomato"]);
+
+// ── FIREBASE ─────────────────────────────────────────────
+firebase.initializeApp({
+  apiKey:"AIzaSyCgIeSCmpYx6S179D2AEVafqhB7k4kZGnI",
+  authDomain:"kkm-vegetable.firebaseapp.com",
+  databaseURL:"https://kkm-vegetable-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"kkm-vegetable",
+  storageBucket:"kkm-vegetable.firebasestorage.app",
+  messagingSenderId:"242685454622",
+  appId:"1:242685454622:web:7c984fa3d97240037dd0e0"
+});
+var DB = firebase.database();
+
+// ── STATE ─────────────────────────────────────────────────
+var STATE = {
+  screen: "loading",
+  role: "",
+  branch: "",
+  logoTaps: 0,
+  orders: {},
+  received: {},
+  prices: {},
+  bDate: todayStr(),
+  bTab: "order",
+  bSearch: "",
+  bEnt: {},
+  bRec: {},
+  bSaved: false,
+  bRSaved: false,
+  aTab: "billing",
+  aDate: todayStr(),
+  aEntBranch: BRANCHES[0],
+  aEnt: {},
+  aRec: {},
+  aSearch: "",
+  aEntTab: "order",
+  malliB: "",
+  pudinaB: "",
+  pinStr: "",
+  pinErr: "",
+  loginMode: "",
+  selBranch: BRANCHES[0],
+  copiedId: ""
+};
+
+function setState(updates) {
+  Object.assign(STATE, updates);
+  render();
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function todayStr() {
+  return new Date().toISOString().split("T")[0];
+}
+function fmtDate(d) {
+  try { return new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"}); }
+  catch(e) { return d; }
+}
+function pv(v) {
+  if (!v) return 0;
+  var s = String(v).toLowerCase().trim();
+  if (!s||s==="-"||s==="nil"||s==="nill") return 0;
+  return parseFloat(s.replace(/[^\d.]/g,""))||0;
+}
+function fbKey(date,branch) {
+  // Match existing Firebase data: 2026_06_26__Hasthinapuram
+  return date.replace(/-/g,"_") + "__" + branch.replace(/\s+/g,"").replace(/[^a-zA-Z0-9]/g,"");
+}
+function itemKey(item) {
+  return item.replace(/\s+/g,"_").replace(/[^a-zA-Z0-9_]/g,"");
+}
+function el(id) { return document.getElementById(id); }
+function h(tag,attrs,children) {
+  var e = document.createElement(tag);
+  if (attrs) Object.entries(attrs).forEach(function(a) {
+    if (a[0]==="className") e.className=a[1];
+    else if (a[0]==="onclick") e.onclick=a[1];
+    else if (a[0]==="onchange") e.onchange=a[1];
+    else if (a[0]==="oninput") e.oninput=a[1];
+    else if (a[0]==="style") Object.assign(e.style,a[1]);
+    else e.setAttribute(a[0],a[1]);
+  });
+  if (children) {
+    if (!Array.isArray(children)) children=[children];
+    children.forEach(function(c) {
+      if (!c && c!==0) return;
+      if (typeof c==="string"||typeof c==="number") e.appendChild(document.createTextNode(c));
+      else e.appendChild(c);
+    });
+  }
+  return e;
+}
+
+// ── SESSION ───────────────────────────────────────────────
+function saveSession(role,branch) {
+  try { localStorage.setItem("kkm_sess",JSON.stringify({role:role,branch:branch||"",t:Date.now()})); } catch(e){}
+}
+function loadSession() {
+  try {
+    var s=JSON.parse(localStorage.getItem("kkm_sess")||"null");
+    if (s && (Date.now()-s.t)<86400000) return s;
+  } catch(e){}
+  return null;
+}
+function clearSession() {
+  try { localStorage.removeItem("kkm_sess"); } catch(e){}
+}
+
+// ── FIREBASE OPS ──────────────────────────────────────────
+function fbSaveOrder(date,branch,val) {
+  var k=fbKey(date,branch);
+  DB.ref("orders/"+k).set(val).catch(function(e){console.error("Save error:",e);});
+}
+function fbSaveReceived(date,branch,val) {
+  var k=fbKey(date,branch);
+  DB.ref("received/"+k).set(val).catch(function(e){console.error("Save error:",e);});
+}
+function fbSavePrice(item,val) {
+  DB.ref("prices/"+item).set(val).catch(function(e){console.error("Save price error:",e);});
+}
+
+// ── FIREBASE LISTENERS ────────────────────────────────────
+DB.ref("orders").on("value",function(snap) {
+  STATE.orders = snap.val()||{};
+  if (STATE.screen==="buyer"&&STATE.branch) {
+    var k=fbKey(STATE.bDate,STATE.branch);
+    STATE.bEnt = Object.assign({},STATE.orders[k]||{});
+    STATE.bSaved = Object.keys(STATE.bEnt).length>0;
+  }
+  render();
+});
+DB.ref("received").on("value",function(snap) {
+  STATE.received = snap.val()||{};
+  render();
+});
+DB.ref("prices").on("value",function(snap) {
+  STATE.prices = snap.val()||{};
+  if (STATE.screen==="loading") {
+    var sess=loadSession();
+    if (sess) {
+      STATE.screen=sess.role;
+      STATE.branch=sess.branch||"";
+      STATE.role=sess.role;
+    } else {
+      STATE.screen="login";
+    }
+  }
+  render();
+});
+DB.ref("v2/purchasePrices").on("value",function(snap){STATE.purchasePrices=snap.val()||{};render();});
+DB.ref("v2/expenses").on("value",function(snap){STATE.expenses=snap.val()||{};render();});
+DB.ref("v2/config/branchPins").on("value",function(snap){
+  var pins=snap.val()||{};
+  Object.entries(pins).forEach(function(e){
+    var branch=BRANCHES.find(function(b){return b.replace(/[^a-zA-Z0-9]/g,"_")===e[0];});
+    if(branch) BRANCH_PINS[branch]=e[1];
+  });
+});
+DB.ref("v2/config/adminPins").on("value",function(snap){
+  var pins=snap.val()||{};
+  if(pins.purchaser) PURCHASER_PIN=pins.purchaser;
+  if(pins.owner) OWNER_PIN=pins.owner;
+});
+
+// ── PIN PAD ───────────────────────────────────────────────
+function renderPinPad(onComplete) {
+  var keys=["1","2","3","4","5","6","7","8","9","","0","⌫"];
+  var pin="";
+  var wrap=h("div");
+  var dots=h("div",{className:"pin-dots"},
+    [0,1,2,3].map(function(i){return h("div",{className:"pin-dot",id:"dot-"+i});})
+  );
+  wrap.appendChild(dots);
+  var grid=h("div",{className:"pin-grid"});
+  keys.forEach(function(k) {
+    var btn=h("button",{className:"pin-key",onclick:function(){
+      if (k==="⌫"){pin=pin.slice(0,-1);}
+      else if (!k||pin.length>=4){return;}
+      else {pin+=k;}
+      [0,1,2,3].forEach(function(i){
+        var d=document.querySelector("#dot-"+i);
+        if(d){d.className="pin-dot"+(i<pin.length?" filled":"");}
+      });
+      if(pin.length===4){var p=pin;pin="";setTimeout(function(){onComplete(p);},150);}
+    }},k);
+    grid.appendChild(btn);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+// ── COPY BLOCK ────────────────────────────────────────────
+function qtyUnitInput(item, getValue, setValue) {
+  // Parse stored value - could be "2 kg" or just "2"
+  var stored = getValue()||"";
+  var parts = String(stored).trim().split(" ");
+  var num = parts[0]||"";
+  var unit = parts[1]||defaultUnit(item);
+
+  var wrap = h("div",{style:{display:"flex",alignItems:"center"}});
+  var inp = h("input",{className:"iinp",value:num,placeholder:"-"});
+  var sel = h("select",{className:"usel"});
+  UNITS.forEach(function(u){
+    var o=h("option",{value:u},u);
+    if(u===unit)o.selected=true;
+    sel.appendChild(o);
+  });
+  inp.oninput=function(e){
+    var v=e.target.value.trim();
+    setValue(v?(v+" "+sel.value):"");
+  };
+  sel.onchange=function(e){
+    var v=inp.value.trim();
+    setValue(v?(v+" "+e.target.value):"");
+  };
+  wrap.appendChild(inp);
+  wrap.appendChild(sel);
+  return wrap;
+}
+  var wrap=h("div");
+  var pre=h("div",{className:"code"},text||"No data yet");
+  var btn=h("button",{className:"btn orange",style:{marginTop:"8px"},onclick:function(){
+    navigator.clipboard.writeText(text||"").then(function(){
+      btn.textContent="✅ Copied!";
+      setTimeout(function(){btn.textContent="📋 Copy";},2000);
+    });
+  }},"📋 Copy");
+  wrap.appendChild(pre);wrap.appendChild(btn);
+  return wrap;
+}
+
+// ── LIST HELPERS ──────────────────────────────────────────
+function gv(branch,item) {
+  var k=fbKey(STATE.aDate,branch);
+  return (STATE.orders[k]||{})[item]||"";
+}
+function getPriceVal(item) {
+  // Check direct item name first, then underscored version
+  return STATE.prices[item] || STATE.prices[itemKey(item)] || "";
+}
+function genT(items) {
+  var bl=OPC.indexOf(items[0])>=0?BRANCHES.filter(function(b){return b!=="3 Bar";}):BRANCHES;
+  var rows=bl.map(function(b){return {branch:b,vals:items.map(function(i){return gv(b,i)||"-";})};});
+  var tots=items.map(function(_,i){var s=rows.reduce(function(a,r){return a+pv(r.vals[i]);},0);return s>0?s:"-";});
+  return {rows:rows,tots:tots,items:items};
+}
+function fmtT(t) {
+  var bw=17,cw=10;
+  var sep="-".repeat(bw)+"+"+t.items.map(function(){return "-".repeat(cw+2);}).join("+");
+  var hdr="Branch".padEnd(bw)+"| "+t.items.map(function(i){return i.padEnd(cw);}).join("| ");
+  var dr=t.rows.map(function(r){return r.branch.padEnd(bw)+"| "+r.vals.map(function(v){return (v||"-").padEnd(cw);}).join("| ");});
+  var tot="Total".padEnd(bw)+"| "+t.tots.map(function(v){return String(v).padEnd(cw);}).join("| ");
+  return [hdr,sep].concat(dr).concat([sep,tot]).join("\n");
+}
+function fmtMP() {
+  var t=fmtT(genT(MP));
+  if(STATE.malliB||STATE.pudinaB){t+="\n\n";if(STATE.malliB)t+=STATE.malliB+" மல்லி பெரிய கட்டு\n";if(STATE.pudinaB)t+=STATE.pudinaB+" புதினா மூடை";}
+  return t;
+}
+function fmtFruits() {
+  return FRUITS.map(function(f){
+    var vals=BRANCHES.map(function(b){return gv(b,f);}).filter(function(v){return v&&v!=="-"&&v.toLowerCase()!=="nil";});
+    return vals.length?f.padEnd(13)+"- "+vals.join(", "):null;
+  }).filter(Boolean).join("\n");
+}
+function fmtOther() {
+  var its=ITEMS.filter(function(i){return OVEXCL.indexOf(i)<0;});
+  var tv=BRANCHES.map(function(b){return gv(b,"Tomato");}).filter(function(v){return v&&v!=="-"&&v.toLowerCase()!=="nil";});
+  var lines=[];
+  if(tv.length){lines.push("Tomato        - "+tv.join(", ")+" ("+tv.reduce(function(a,v){return a+pv(v);},0)+")");lines.push("");}
+  its.forEach(function(item){
+    var vals=BRANCHES.map(function(b){return gv(b,item);}).filter(function(v){return v&&v!=="-"&&v.toLowerCase()!=="nil";});
+    if(!vals.length)return;
+    lines.push(item.padEnd(14)+"- "+vals.join(", ")+" ("+vals.reduce(function(a,v){return a+pv(v);},0)+")");
+  });
+  return lines.join("\n");
+}
+function allLists() {
+  return ["═══ 1. ONION | POTATO | CAULIFLOWER ═══\n"+fmtT(genT(OPC)),"═══ 2. SPRING ONION & PALAK ═══\n"+fmtT(genT(SP)),"═══ 3. MALLI & PUDINA ═══\n"+fmtMP(),"═══ 4. MUSHROOM & BABY CORN ═══\n"+fmtT(genT(MBC)),"═══ 5. FRUITS ═══\n"+(fmtFruits()||"No fruits"),"═══ 6. OTHER VEGETABLES ═══\n"+(fmtOther()||"No data")].join("\n\n");
+}
+
+// ── TODAY ITEMS ───────────────────────────────────────────
+function getTodayItems() {
+  var items=[];
+  BRANCHES.forEach(function(b){
+    var k=fbKey(STATE.aDate,b);
+    Object.keys(STATE.orders[k]||{}).forEach(function(i){if(items.indexOf(i)<0)items.push(i);});
+  });
+  return items;
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function render() {
+  var app=document.getElementById("app");
+  if(!app)return;
+  app.innerHTML="";
+
+  if(STATE.screen==="loading"){
+    app.appendChild(h("div",{className:"center"},[
+      h("div",{style:{fontSize:40}},"🥬"),
+      h("div",{style:{fontSize:16,color:"#00d68f",marginTop:12}},"Loading KKM Vegetable..."),
+      h("div",{style:{fontSize:12,color:"#5a7a94",marginTop:6}},"Connecting to Firebase...")
+    ]));
+    return;
+  }
+
+  if(STATE.screen==="login"){renderLogin(app);return;}
+  if(STATE.screen==="buyer"){renderBuyer(app);return;}
+  if(STATE.screen==="admin"){renderAdmin(app);return;}
+  if(STATE.screen==="purchaser"){renderPurchaser(app);return;}
+  if(STATE.screen==="owner"){renderAdmin(app);return;} // owner sees full admin
+}
+
+// ── LOGIN ─────────────────────────────────────────────────
+function renderLogin(app) {
+  var wrap=h("div",{className:"center"});
+  var card=h("div",{className:"lcard"});
+
+  // Logo - tap 3 times for admin
+  var logoEl=h("div",{style:{fontSize:32,textAlign:"center",marginBottom:4,cursor:"pointer",userSelect:"none"},onclick:function(){
+    STATE.logoTaps=(STATE.logoTaps||0)+1;
+    if(STATE.logoTaps>=3){STATE.logoTaps=0;setState({loginMode:"secretadmin"});}
+    else{setTimeout(function(){if(STATE.logoTaps<3)STATE.logoTaps=0;},2000);}
+  }},"🥬");
+  card.appendChild(logoEl);
+  card.appendChild(h("div",{style:{fontSize:20,fontWeight:"800",color:"#00d68f",textAlign:"center",marginBottom:2}},"KKM Vegetable"));
+  card.appendChild(h("div",{style:{fontSize:12,color:"#5a7a94",textAlign:"center",marginBottom:24}},"Daily Purchase Manager"));
+
+  if(!STATE.loginMode){
+    // Only show Branch Login
+    card.appendChild(h("button",{className:"btn",onclick:function(){setState({loginMode:"buyer"});}}, "🏪 Branch Login"));
+
+  } else if(STATE.loginMode==="buyer"){
+    card.appendChild(h("button",{style:{background:"none",border:"none",color:"#5a7a94",fontSize:12,cursor:"pointer",marginBottom:12,padding:0},onclick:function(){setState({loginMode:"",pinErr:"",logoTaps:0});}},"← Back"));
+    card.appendChild(h("label",{style:{fontSize:11,color:"#5a7a94",fontWeight:700,textTransform:"uppercase",letterSpacing:".5px",display:"block",marginBottom:5}},"Select Branch"));
+    var sel=h("select",{className:"sel",onchange:function(e){STATE.selBranch=e.target.value;}});
+    BRANCHES.forEach(function(b){var o=h("option",{value:b},b);if(b===STATE.selBranch)o.selected=true;sel.appendChild(o);});
+    card.appendChild(sel);
+    card.appendChild(h("label",{style:{fontSize:11,color:"#5a7a94",fontWeight:700,textTransform:"uppercase",letterSpacing:".5px",display:"block",marginBottom:5}},"Branch PIN"));
+    card.appendChild(renderPinPad(function(pin){
+      if(BRANCH_PINS[STATE.selBranch]===pin){
+        saveSession("buyer",STATE.selBranch);
+        var k=fbKey(STATE.bDate,STATE.selBranch);
+        var ord=Object.assign({},STATE.orders[k]||{});
+        setState({screen:"buyer",role:"buyer",branch:STATE.selBranch,bEnt:ord,bSaved:Object.keys(ord).length>0,bRSaved:!!(STATE.received[k]&&Object.keys(STATE.received[k]).length),loginMode:"",pinErr:""});
+      } else setState({pinErr:"Wrong PIN. Try again."});
+    }));
+    if(STATE.pinErr) card.appendChild(h("div",{style:{color:"#ff4d4d",fontSize:12,textAlign:"center",marginTop:8}},STATE.pinErr));
+
+  } else if(STATE.loginMode==="secretadmin"){
+    // Secret admin - choose which admin
+    card.appendChild(h("button",{style:{background:"none",border:"none",color:"#5a7a94",fontSize:12,cursor:"pointer",marginBottom:16,padding:0},onclick:function(){setState({loginMode:"",pinErr:"",logoTaps:0});}},"← Back"));
+    card.appendChild(h("div",{style:{fontSize:12,color:"#5a7a94",textAlign:"center",marginBottom:16}},"Select Admin"));
+    var abtnWrap=h("div",{style:{display:"flex",flexDirection:"column",gap:10}});
+    abtnWrap.appendChild(h("button",{className:"btn",style:{background:"#1a5276"},onclick:function(){setState({loginMode:"purchaserpin",pinErr:""}); }}, "Admin 1"));
+    abtnWrap.appendChild(h("button",{className:"btn",style:{background:"#1a3450"},onclick:function(){setState({loginMode:"ownerpin",pinErr:""}); }}, "Admin 2"));
+    card.appendChild(abtnWrap);
+
+  } else if(STATE.loginMode==="purchaserpin"){
+    card.appendChild(h("button",{style:{background:"none",border:"none",color:"#5a7a94",fontSize:12,cursor:"pointer",marginBottom:12,padding:0},onclick:function(){setState({loginMode:"secretadmin",pinErr:""});}},"← Back"));
+    card.appendChild(h("label",{style:{fontSize:11,color:"#5a7a94",fontWeight:700,textTransform:"uppercase",letterSpacing:".5px",display:"block",marginBottom:5}},"Admin 1 PIN"));
+    card.appendChild(renderPinPad(function(pin){
+      if(pin===PURCHASER_PIN){saveSession("purchaser","Admin1");setState({screen:"purchaser",role:"purchaser",branch:"Purchaser",loginMode:"",pinErr:""});}
+      else setState({pinErr:"Wrong PIN. Try again."});
+    }));
+    if(STATE.pinErr) card.appendChild(h("div",{style:{color:"#ff4d4d",fontSize:12,textAlign:"center",marginTop:8}},STATE.pinErr));
+
+  } else if(STATE.loginMode==="ownerpin"){
+    card.appendChild(h("button",{style:{background:"none",border:"none",color:"#5a7a94",fontSize:12,cursor:"pointer",marginBottom:12,padding:0},onclick:function(){setState({loginMode:"secretadmin",pinErr:""});}},"← Back"));
+    card.appendChild(h("label",{style:{fontSize:11,color:"#5a7a94",fontWeight:700,textTransform:"uppercase",letterSpacing:".5px",display:"block",marginBottom:5}},"Admin 2 PIN"));
+    card.appendChild(renderPinPad(function(pin){
+      if(pin===OWNER_PIN||pin===ADMIN_PIN){saveSession("owner","Admin2");setState({screen:"owner",role:"owner",branch:"Owner",loginMode:"",pinErr:""});}
+      else setState({pinErr:"Wrong PIN. Try again."});
+    }));
+    if(STATE.pinErr) card.appendChild(h("div",{style:{color:"#ff4d4d",fontSize:12,textAlign:"center",marginTop:8}},STATE.pinErr));
+  }
+
+  wrap.appendChild(card);
+  app.appendChild(wrap);
+}
+
+// ── BUYER ─────────────────────────────────────────────────
+function renderBuyer(app) {
+  var div=h("div",{className:"app"});
+
+  // Header
+  var hdrEl=h("div",{className:"hdr"},[
+    h("div",null,[h("div",{style:{fontSize:16,fontWeight:800,color:"#00d68f"}},"🏪 "+STATE.branch),h("div",{style:{fontSize:11,color:"#5a7a94"}},"Branch Portal")]),
+    h("button",{className:"bsm dark",onclick:function(){clearSession();setState({screen:"login",role:"",branch:"",loginMode:"",bEnt:{},bSaved:false,bRSaved:false});}}, "Logout")
+  ]);
+  div.appendChild(hdrEl);
+
+  // Tabs
+  var tabsEl=h("div",{className:"tabs"});
+  ["order","received"].forEach(function(t){
+    var tb=h("button",{className:"tab"+(STATE.bTab===t?" active":""),onclick:function(){setState({bTab:t});}},t==="order"?"📝 Place Order":"✅ Received Qty");
+    tabsEl.appendChild(tb);
+  });
+  div.appendChild(tabsEl);
+
+  var sec=h("div",{className:"sec"});
+
+  // Date bar
+  var dbar=h("div",{className:"dbar"},[
+    h("span",{style:{fontSize:12,color:"#5a7a94",fontWeight:700}},"DATE"),
+    (function(){var inp=h("input",{type:"date",value:STATE.bDate,style:{background:"none",border:"none",color:"#00d68f",fontSize:13,fontWeight:700,outline:"none"}});inp.onchange=function(e){var d=e.target.value;var k=fbKey(d,STATE.branch);var ord=Object.assign({},STATE.orders[k]||{});setState({bDate:d,bEnt:ord,bSaved:Object.keys(ord).length>0});};return inp;})()
+  ]);
+  sec.appendChild(dbar);
+
+  if(STATE.bTab==="order"){
+    // Status card
+    var statCard=h("div",{className:"card",style:{marginBottom:12}});
+    statCard.appendChild(h("div",{style:{padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}},[
+      h("span",{style:{fontSize:12,color:"#5a7a94"}},Object.keys(STATE.bEnt).filter(function(k){return STATE.bEnt[k];}).length+" items"),
+      h("span",{className:"bdg "+(STATE.bSaved?"green":"yellow")},STATE.bSaved?"✅ Saved":"⏳ Unsaved")
+    ]));
+    sec.appendChild(statCard);
+
+    // Search
+    var srch=h("input",{className:"inp",placeholder:"🔍 Search...",style:{marginBottom:"12px"},value:STATE.bSearch||""});
+    srch.oninput=function(e){STATE.bSearch=e.target.value;render();};
+    sec.appendChild(srch);
+
+    // Items
+    var icard=h("div",{className:"card"});
+    icard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"Enter Quantities")));
+    var filtered=ITEMS.filter(function(i){return i.toLowerCase().indexOf((STATE.bSearch||"").toLowerCase())>=0;});
+    filtered.forEach(function(item){
+      var row=h("div",{className:"irow"},[
+        h("span",{style:{flex:1,fontSize:13}},item),
+        (function(){return qtyUnitInput(item,function(){return STATE.bEnt[item]||"";},function(v){STATE.bEnt[item]=v;});})()
+      ]);
+      icard.appendChild(row);
+    });
+    sec.appendChild(icard);
+
+    // Save button
+    var saveBtn=h("button",{className:"btn",onclick:function(){
+      var val={};
+      ITEMS.forEach(function(i){if(STATE.bEnt[i]&&String(STATE.bEnt[i]).trim())val[i]=STATE.bEnt[i];});
+      if(Object.keys(val).length===0){alert("Please enter at least one item quantity!");return;}
+      fbSaveOrder(STATE.bDate,STATE.branch,val);
+      STATE.bSaved=true;
+      alert("✅ Order saved successfully!");
+      render();
+    }},"💾 Save Order");
+    sec.appendChild(saveBtn);
+
+    if(STATE.bSaved){
+      var shareBtn=h("button",{className:"btn green",style:{marginTop:"8px"},onclick:function(){
+        var lines=["🛒 *"+STATE.branch+"*","📅 "+fmtDate(STATE.bDate),"📋 *Purchase Order*","─".repeat(28)];
+        Object.entries(STATE.bEnt).filter(function(e){return e[1];}).forEach(function(e){lines.push("• "+e[0]+" "+e[1]);});
+        lines.push("─".repeat(28));lines.push("Total items: "+Object.keys(STATE.bEnt).filter(function(k){return STATE.bEnt[k];}).length);
+        window.open("https://wa.me/?text="+encodeURIComponent(lines.join("\n")),"_blank");
+      }},"📤 Share Order on WhatsApp");
+      sec.appendChild(shareBtn);
+    }
+  }
+
+  if(STATE.bTab==="received"){
+    if(!STATE.bSaved){
+      sec.appendChild(h("div",{className:"card",style:{padding:20,textAlign:"center",color:"#5a7a94",fontSize:13}},"⚠️ Save order first"));
+    } else {
+      var recCard=h("div",{className:"card"});
+      recCard.appendChild(h("div",{className:"card-h"},[
+        h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"Ordered → Received"),
+        h("span",{className:"bdg "+(STATE.bRSaved?"green":"yellow")},STATE.bRSaved?"✅ Done":"⏳ Pending")
+      ]));
+      Object.entries(STATE.bEnt).filter(function(e){return e[1];}).forEach(function(e){
+        var item=e[0],ordQty=e[1];
+        var row=h("div",{className:"irow"},[
+          h("div",{style:{flex:1}},[h("div",{style:{fontSize:13}},item),h("div",{style:{fontSize:11,color:"#5a7a94"}},"Ordered: "+ordQty)]),
+          (function(){var inp=h("input",{className:"iinp",value:STATE.bRec[item]!==undefined?STATE.bRec[item]:ordQty,placeholder:ordQty});inp.oninput=function(e){STATE.bRec[item]=e.target.value;};return inp;})()
+        ]);
+        recCard.appendChild(row);
+      });
+      sec.appendChild(recCard);
+      sec.appendChild(h("button",{className:"btn blue",onclick:function(){
+        var merged={};
+        Object.entries(STATE.bEnt).filter(function(e){return e[1];}).forEach(function(e){
+          var k=e[0],v=e[1];
+          merged[k]=(STATE.bRec[k]!==undefined&&STATE.bRec[k]!=="")? STATE.bRec[k]:v;
+        });
+        fbSaveReceived(STATE.bDate,STATE.branch,merged);
+        STATE.bRSaved=true;
+        alert("✅ Received quantities confirmed!");
+        render();
+      }},"✅ Confirm Received"));
+      if(STATE.bRSaved){
+        sec.appendChild(h("button",{className:"btn green",style:{marginTop:"8px"},onclick:function(){
+          var k=fbKey(STATE.bDate,STATE.branch);
+          var rec=STATE.received[k]||{};
+          var lines=["✅ *"+STATE.branch+"*","📅 "+fmtDate(STATE.bDate),"📋 *Received Qty*","─".repeat(28)];
+          Object.entries(rec).forEach(function(e){lines.push("• "+e[0]+" "+e[1]);});
+          lines.push("─".repeat(28));lines.push("Total: "+Object.keys(rec).length+" items");
+          window.open("https://wa.me/?text="+encodeURIComponent(lines.join("\n")),"_blank");
+        }},"📤 Share Received on WhatsApp"));
+      }
+    }
+  }
+
+  div.appendChild(sec);
+  app.appendChild(div);
+}
+
+// ── PURCHASER ──────────────────────────────────────────────
+function renderPurchaser(app) {
+  var div=h("div",{className:"app"});
+
+  div.appendChild(h("div",{className:"hdr"},[
+    h("div",null,[
+      h("div",{style:{fontSize:16,fontWeight:800,color:"#00d68f"}},"🔐 Admin 1"),
+      h("div",{style:{fontSize:11,color:"#5a7a94"}},"Purchase Manager")
+    ]),
+    h("button",{className:"bsm dark",onclick:function(){clearSession();setState({screen:"login",role:"",branch:"",loginMode:""});}}, "Logout")
+  ]));
+
+  // Date bar
+  var sec=h("div",{style:{padding:"12px 14px 0"}});
+  sec.appendChild(h("div",{className:"dbar"},[
+    h("span",{style:{fontSize:12,color:"#5a7a94",fontWeight:700}},"DATE"),
+    (function(){var inp=h("input",{type:"date",value:STATE.aDate,style:{background:"none",border:"none",color:"#00d68f",fontSize:13,fontWeight:700,outline:"none"}});inp.onchange=function(e){STATE.aDate=e.target.value;render();};return inp;})()
+  ]));
+  div.appendChild(sec);
+
+  var main=h("div",{className:"sec"});
+
+  // ── PURCHASE LIST ──
+  var pCard=h("div",{className:"card"});
+  pCard.appendChild(h("div",{className:"card-h"},[
+    h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"📋 Purchase List & Prices"),
+    h("span",{style:{fontSize:11,color:"#5a7a94"}},STATE.aDate)
+  ]));
+
+  var todayItems=getTodayItems();
+  var purchasePrices=(STATE.purchasePrices&&STATE.purchasePrices[STATE.aDate])||{};
+  var grandTotal=0;
+
+  if(todayItems.length===0){
+    pCard.appendChild(h("div",{style:{padding:20,textAlign:"center",color:"#5a7a94",fontSize:13}},"No orders yet for "+STATE.aDate));
+  } else {
+    // Header row
+    var hRow=h("div",{style:{display:"flex",padding:"6px 14px",borderBottom:"1px solid #1a3450",background:"#0a1824"}});
+    hRow.appendChild(h("span",{style:{flex:2,fontSize:11,color:"#5a7a94",fontWeight:700}},"ITEM"));
+    hRow.appendChild(h("span",{style:{width:70,fontSize:11,color:"#5a7a94",fontWeight:700,textAlign:"right"}},"ORDER QTY"));
+    hRow.appendChild(h("span",{style:{width:80,fontSize:11,color:"#5a7a94",fontWeight:700,textAlign:"right"}},"PRICE ₹"));
+    hRow.appendChild(h("span",{style:{width:70,fontSize:11,color:"#5a7a94",fontWeight:700,textAlign:"right"}},"TOTAL ₹"));
+    pCard.appendChild(hRow);
+
+    todayItems.forEach(function(item){
+      var totalQty=0;
+      BRANCHES.forEach(function(b){
+        var k=fbKey(STATE.aDate,b);
+        totalQty+=pv((STATE.orders[k]||{})[item]||0);
+      });
+      if(totalQty===0)return;
+
+      var ppKey=item.replace(/[^a-zA-Z0-9]/g,"_");
+      var pp=pv(purchasePrices[ppKey]||0);
+      var rowTotal=totalQty*pp;
+      grandTotal+=rowTotal;
+
+      var row=h("div",{className:"irow"});
+      row.appendChild(h("span",{style:{flex:2,fontSize:13}},item));
+      row.appendChild(h("span",{style:{width:70,fontSize:12,color:"#4dabf7",textAlign:"right"}},totalQty));
+      var priceInp=h("input",{className:"iinp",style:{width:75},value:pp||"",placeholder:"0"});
+      priceInp.oninput=function(e){
+        var ppObj=STATE.purchasePrices||{};
+        ppObj[ppKey]=e.target.value;
+        STATE.purchasePrices=ppObj;
+        DB.ref("v2/purchasePrices/"+STATE.aDate+"/"+ppKey).set(e.target.value);
+        render();
+      };
+      row.appendChild(priceInp);
+      row.appendChild(h("span",{style:{width:70,fontSize:12,color:rowTotal>0?"#00d68f":"#5a7a94",textAlign:"right",fontWeight:700}},rowTotal>0?rowTotal.toLocaleString("en-IN"):"-"));
+      pCard.appendChild(row);
+    });
+
+    // Grand total row
+    var totRow=h("div",{style:{display:"flex",padding:"10px 14px",borderTop:"2px solid #1a3450",background:"#0a1824"}});
+    totRow.appendChild(h("span",{style:{flex:2,fontSize:13,fontWeight:700,color:"#e8f4fd"}},"Grand Total"));
+    totRow.appendChild(h("span",{style:{width:70}}));
+    totRow.appendChild(h("span",{style:{width:80}}));
+    totRow.appendChild(h("span",{style:{width:70,fontSize:14,fontWeight:700,color:"#00d68f",textAlign:"right"}},grandTotal.toLocaleString("en-IN")));
+    pCard.appendChild(totRow);
+  }
+  main.appendChild(pCard);
+
+  // ── EXPENSES ──
+  var expKey="exp_"+STATE.aDate.replace(/-/g,"_");
+  var expenses=STATE.expenses||{};
+  var dayExpenses=expenses[expKey]||[];
+  var expTotal=dayExpenses.reduce(function(a,e){return a+pv(e.amount);},0);
+
+  var expCard=h("div",{className:"card"});
+  expCard.appendChild(h("div",{className:"card-h"},[
+    h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"💸 Expenses"),
+    h("button",{className:"bsm",onclick:function(){
+      var newExp={name:"",amount:""};
+      dayExpenses.push(newExp);
+      var expObj=STATE.expenses||{};
+      expObj[expKey]=dayExpenses;
+      STATE.expenses=expObj;
+      DB.ref("v2/expenses/"+expKey).set(dayExpenses);
+      render();
+    }},"+Add")
+  ]));
+
+  if(dayExpenses.length===0){
+    expCard.appendChild(h("div",{style:{padding:"12px 14px",color:"#5a7a94",fontSize:12}},"No expenses yet. Tap +Add to add."));
+  } else {
+    dayExpenses.forEach(function(exp,i){
+      var row=h("div",{className:"irow"});
+      var nameInp=h("input",{style:{flex:1,background:"#0d2035",border:"1px solid #1a3450",borderRadius:6,padding:"5px 8px",color:"#e8f4fd",fontSize:13,outline:"none"},placeholder:"Expense name",value:exp.name||""});
+      nameInp.oninput=function(e){
+        dayExpenses[i].name=e.target.value;
+        var expObj=STATE.expenses||{};expObj[expKey]=dayExpenses;STATE.expenses=expObj;
+        DB.ref("v2/expenses/"+expKey).set(dayExpenses);
+      };
+      var amtInp=h("input",{className:"iinp",style:{width:90},placeholder:"0",value:exp.amount||""});
+      amtInp.oninput=function(e){
+        dayExpenses[i].amount=e.target.value;
+        var expObj=STATE.expenses||{};expObj[expKey]=dayExpenses;STATE.expenses=expObj;
+        DB.ref("v2/expenses/"+expKey).set(dayExpenses);
+        render();
+      };
+      var delBtn=h("button",{style:{background:"none",border:"none",color:"#ff4d4d",fontSize:16,cursor:"pointer",padding:"0 4px"},onclick:function(){
+        dayExpenses.splice(i,1);
+        var expObj=STATE.expenses||{};expObj[expKey]=dayExpenses;STATE.expenses=expObj;
+        DB.ref("v2/expenses/"+expKey).set(dayExpenses);
+        render();
+      }},"✕");
+      row.appendChild(nameInp);row.appendChild(amtInp);row.appendChild(delBtn);
+      expCard.appendChild(row);
+    });
+    var expTotRow=h("div",{style:{display:"flex",justifyContent:"space-between",padding:"10px 14px",borderTop:"2px solid #1a3450",background:"#0a1824"}});
+    expTotRow.appendChild(h("span",{style:{fontSize:13,fontWeight:700}},"Total Expenses"));
+    expTotRow.appendChild(h("span",{style:{fontSize:14,fontWeight:700,color:"#ff6b35"}},expTotal.toLocaleString("en-IN")));
+    expCard.appendChild(expTotRow);
+  }
+  main.appendChild(expCard);
+
+  // ── GRAND SUMMARY ──
+  var sumCard=h("div",{className:"card"});
+  sumCard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"📊 Summary")));
+  [{l:"Purchase Total",v:grandTotal,c:"#00d68f"},{l:"Total Expenses",v:expTotal,c:"#ff6b35"},{l:"Grand Total",v:grandTotal+expTotal,c:"#ffc107"}].forEach(function(r){
+    var row=h("div",{style:{display:"flex",justifyContent:"space-between",padding:"10px 14px",borderBottom:"1px solid #1a3450"}});
+    row.appendChild(h("span",{style:{fontSize:13,fontWeight:r.l==="Grand Total"?700:400}},r.l));
+    row.appendChild(h("span",{style:{fontSize:14,fontWeight:700,color:r.c}},"₹"+r.v.toLocaleString("en-IN")));
+    sumCard.appendChild(row);
+  });
+  main.appendChild(sumCard);
+
+  // ── LISTS ──
+  var listsCard=h("div",{className:"card"});
+  listsCard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"📋 Purchase Lists")));
+  [[OPC,"1. Onion | Potato | Cauliflower","opc"],[SP,"2. Spring Onion & Palak","sp"],[MP,"3. Malli & Pudina","mp"],[MBC,"4. Mushroom & Baby Corn","mbc"]].forEach(function(t){
+    var c=h("div",{style:{borderBottom:"1px solid #1a3450"}});
+    c.appendChild(h("div",{style:{padding:"8px 14px",fontSize:12,fontWeight:700,color:"#5a7a94"}},t[1]));
+    c.appendChild(h("div",{style:{padding:"0 14px 8px"}},copyBlock(fmtT(genT(t[0])),t[2]+"_p")));
+    listsCard.appendChild(c);
+  });
+  listsCard.appendChild(h("div",{style:{borderBottom:"1px solid #1a3450",padding:"0 14px 8px"}},[h("div",{style:{padding:"8px 0",fontSize:12,fontWeight:700,color:"#5a7a94"}},"5. Fruits"),copyBlock(fmtFruits()||"No fruits","fruits_p")]));
+  listsCard.appendChild(h("div",{style:{padding:"0 14px 8px"}},[h("div",{style:{padding:"8px 0",fontSize:12,fontWeight:700,color:"#5a7a94"}},"6. Other Vegetables"),copyBlock(fmtOther()||"No data","veg_p")]));
+  main.appendChild(listsCard);
+
+  div.appendChild(main);
+  app.appendChild(div);
+}
+
+// ── ADMIN ─────────────────────────────────────────────────
+function renderAdmin(app) {
+  var div=h("div",{className:"app"});
+
+  // Header - show Admin 2 for owner
+  div.appendChild(h("div",{className:"hdr"},[
+    h("div",null,[h("div",{style:{fontSize:16,fontWeight:800,color:"#00d68f"}},STATE.role==="owner"?"👑 Admin 2":"🔐 Admin Panel"),h("div",{style:{fontSize:11,color:"#5a7a94"}},"Purchase Manager")]),
+    h("button",{className:"bsm dark",onclick:function(){clearSession();setState({screen:"login",role:"",branch:"",loginMode:""});}}, "Logout")
+  ]));
+
+  // Tabs
+  var tabsEl=h("div",{className:"tabs"});
+  var adminTabs=[["billing","💰 Billing"],["entry","📝 Entry"],["lists","📋 Lists"],["branches","🏪 Branches"],["compare","📊 Compare"]];
+  if(STATE.role==="owner") adminTabs.push(["backup","💾 Backup"]);
+  if(STATE.role==="owner") adminTabs.push(["pinchange","🔑 PINs"]);
+  adminTabs.forEach(function(t){
+    tabsEl.appendChild(h("button",{className:"tab"+(STATE.aTab===t[0]?" active":""),onclick:function(){setState({aTab:t[0]});}},t[1]));
+  });
+  div.appendChild(tabsEl);
+
+  // Date bar
+  var sec=h("div",{style:{padding:"12px 14px 0"}});
+  var dbar=h("div",{className:"dbar"},[
+    h("span",{style:{fontSize:12,color:"#5a7a94",fontWeight:700}},"DATE"),
+    (function(){var inp=h("input",{type:"date",value:STATE.aDate,style:{background:"none",border:"none",color:"#00d68f",fontSize:13,fontWeight:700,outline:"none"}});inp.onchange=function(e){var d=e.target.value;var k=fbKey(d,STATE.aEntBranch);STATE.aDate=d;STATE.aEnt=Object.assign({},STATE.orders[k]||{});STATE.aRec=Object.assign({},STATE.received[k]||{});render();};return inp;})()
+  ]);
+  sec.appendChild(dbar);
+  div.appendChild(sec);
+
+  var main=h("div",{className:"sec"});
+
+  // ─ BILLING TAB ─
+  if(STATE.aTab==="billing"){
+    var todayItems=getTodayItems();
+
+    // Prices
+    var priceCard=h("div",{className:"card"});
+    priceCard.appendChild(h("div",{className:"card-h"},[
+      h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"💰 Item Prices"),
+      h("span",{className:"bdg yellow"},"Same for all branches")
+    ]));
+    if(todayItems.length===0){
+      priceCard.appendChild(h("div",{style:{padding:20,textAlign:"center",color:"#5a7a94",fontSize:13}},"No orders for "+STATE.aDate+". Use Entry tab."));
+    } else {
+      todayItems.forEach(function(item){
+        var row=h("div",{className:"irow"},[
+          h("span",{style:{flex:1,fontSize:13}},item),
+          h("span",{style:{fontSize:12,color:"#5a7a94",marginRight:2}},"₹"),
+          (function(){
+            var inp=h("input",{className:"iinp",value:getPriceVal(item)||"",placeholder:"0"});
+            inp.oninput=function(e){fbSavePrice(item,e.target.value);};
+            return inp;
+          })()
+        ]);
+        priceCard.appendChild(row);
+      });
+    }
+    main.appendChild(priceCard);
+
+    // Bills
+    var billCard=h("div",{className:"card"});
+    billCard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"🧾 Generate Bills")));
+    BRANCHES.forEach(function(b){
+      var k=fbKey(STATE.aDate,b);
+      var src=STATE.received[k]||STATE.orders[k]||{};
+      var itemList=Object.entries(src).filter(function(e){return e[1]&&String(e[1]).trim()&&String(e[1])!=="-";});
+      var hasOrd=!!(STATE.orders[k]&&Object.keys(STATE.orders[k]).length);
+      var hasRec=!!(STATE.received[k]&&Object.keys(STATE.received[k]).length);
+      var priced=itemList.filter(function(e){return pv(getPriceVal(e[0]))>0;}).length;
+      var canBill=itemList.length>0&&priced>0;
+      var row=h("div",{className:"irow"},[
+        h("div",{style:{flex:1}},[
+          h("div",{style:{fontSize:13,fontWeight:600}},b),
+          h("div",{style:{fontSize:11,color:"#5a7a94",marginTop:2}},
+            hasRec?"✅ Received · "+itemList.length+" items · "+priced+" priced":
+            hasOrd?"📦 Ordered · "+itemList.length+" items · "+priced+" priced":
+            "⏳ No order")
+        ]),
+        h("button",{className:"bsm"+(canBill?"":" dis"),onclick:function(){
+          if(!canBill)return;
+          var billItems=itemList.map(function(e){
+            var nm=e[0],qty=e[1];
+            var price=pv(getPriceVal(nm));
+            return {name:nm,qty:String(qty),price:price,amount:pv(qty)*price};
+          }).filter(function(it){return it.price>0&&pv(it.qty)>0;});
+          if(!billItems.length){alert("Enter prices first!");return;}
+          showBill(b,STATE.aDate,billItems);
+        }},"🧾 Bill")
+      ]);
+      billCard.appendChild(row);
+    });
+    main.appendChild(billCard);
+  }
+
+  // ─ ENTRY TAB ─
+  if(STATE.aTab==="entry"){
+    var brSel=h("div",{className:"card",style:{marginBottom:12}});
+    brSel.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"Select Branch")));
+    var bselWrap=h("div",{style:{padding:12}});
+    var bsel=h("select",{className:"sel",onchange:function(e){var b=e.target.value;var k=fbKey(STATE.aDate,b);STATE.aEntBranch=b;STATE.aEnt=Object.assign({},STATE.orders[k]||{});STATE.aRec=Object.assign({},STATE.received[k]||{});render();}});
+    BRANCHES.forEach(function(b){var o=h("option",{value:b},b);if(b===STATE.aEntBranch)o.selected=true;bsel.appendChild(o);});
+    bselWrap.appendChild(bsel);brSel.appendChild(bselWrap);main.appendChild(brSel);
+
+    var etabs=h("div",{className:"tabs"});
+    [["order","📝 Order"],["received","✅ Received"]].forEach(function(t){
+      etabs.appendChild(h("button",{className:"tab"+(STATE.aEntTab===t[0]?" active":""),onclick:function(){setState({aEntTab:t[0]});}},t[1]));
+    });
+    main.appendChild(etabs);
+
+    if(STATE.aEntTab==="order"){
+      var srch2=h("input",{className:"inp",placeholder:"🔍 Search...",style:{marginBottom:"12px",marginTop:"12px"},value:STATE.aSearch||""});
+      srch2.oninput=function(e){STATE.aSearch=e.target.value;render();};
+      main.appendChild(srch2);
+      var ecard=h("div",{className:"card"});
+      ecard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},STATE.aEntBranch+" — Order")));
+      var af=ITEMS.filter(function(i){return i.toLowerCase().indexOf((STATE.aSearch||"").toLowerCase())>=0;});
+      af.forEach(function(item){
+        var row=h("div",{className:"irow"},[
+          h("span",{style:{flex:1,fontSize:13}},item),
+          (function(){return qtyUnitInput(item,function(){return STATE.aEnt[item]||"";},function(v){STATE.aEnt[item]=v;});})()
+        ]);
+        ecard.appendChild(row);
+      });
+      main.appendChild(ecard);
+      main.appendChild(h("button",{className:"btn",onclick:function(){
+        var val={};
+        ITEMS.forEach(function(i){if(STATE.aEnt[i]&&String(STATE.aEnt[i]).trim())val[i]=STATE.aEnt[i];});
+        if(Object.keys(val).length===0){alert("Enter at least one item!");return;}
+        fbSaveOrder(STATE.aDate,STATE.aEntBranch,val);
+        alert("✅ Saved for "+STATE.aEntBranch);
+        render();
+      }},"💾 Save Order for "+STATE.aEntBranch));
+    }
+
+    if(STATE.aEntTab==="received"){
+      var ak=fbKey(STATE.aDate,STATE.aEntBranch);
+      if(!STATE.orders[ak]||!Object.keys(STATE.orders[ak]).length){
+        main.appendChild(h("div",{className:"card",style:{padding:20,textAlign:"center",color:"#5a7a94",fontSize:13,marginTop:12}},"⚠️ Save order first"));
+      } else {
+        var rcard=h("div",{className:"card",style:{marginTop:12}});
+        rcard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},STATE.aEntBranch+" — Received")));
+        Object.entries(STATE.orders[ak]).filter(function(e){return e[1];}).forEach(function(e){
+          var item=e[0],ordQty=e[1];
+          var row=h("div",{className:"irow"},[
+            h("div",{style:{flex:1}},[h("div",{style:{fontSize:13}},item),h("div",{style:{fontSize:11,color:"#5a7a94"}},"Ordered: "+ordQty)]),
+            (function(){var inp=h("input",{className:"iinp",value:STATE.aRec[item]!==undefined?STATE.aRec[item]:ordQty,placeholder:ordQty});inp.oninput=function(e){STATE.aRec[item]=e.target.value;};return inp;})()
+          ]);
+          rcard.appendChild(row);
+        });
+        main.appendChild(rcard);
+        main.appendChild(h("button",{className:"btn blue",style:{marginTop:"12px"},onclick:function(){
+          var src=STATE.orders[ak]||{};
+          var merged={};
+          Object.entries(src).filter(function(e){return e[1];}).forEach(function(e){
+            var k=e[0],v=e[1];
+            merged[k]=(STATE.aRec[k]!==undefined&&STATE.aRec[k]!=="")? STATE.aRec[k]:v;
+          });
+          fbSaveReceived(STATE.aDate,STATE.aEntBranch,merged);
+          alert("✅ Received confirmed for "+STATE.aEntBranch);
+          render();
+        }},"✅ Confirm Received for "+STATE.aEntBranch));
+      }
+    }
+  }
+
+  // ─ LISTS TAB ─
+  if(STATE.aTab==="lists"){
+    [[OPC,"1. Onion | Potato | Cauliflower","opc"],[SP,"2. Spring Onion & Palak","sp"],[MBC,"4. Mushroom & Baby Corn","mbc"]].forEach(function(t){
+      var c=h("div",{className:"card"});
+      c.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},t[1])));
+      c.appendChild(h("div",{style:{padding:12}},copyBlock(fmtT(genT(t[0])),t[2])));
+      main.appendChild(c);
+    });
+    var mpc=h("div",{className:"card"});
+    mpc.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"3. Malli & Pudina")));
+    var mpWrap=h("div",{style:{padding:12}});
+    var mpRow=h("div",{style:{display:"flex",gap:8,marginBottom:10}});
+    var mi=h("input",{className:"inp",placeholder:"24",style:{marginBottom:0},value:STATE.malliB});mi.oninput=function(e){STATE.malliB=e.target.value;render();};
+    var pi=h("input",{className:"inp",placeholder:"1",style:{marginBottom:0},value:STATE.pudinaB});pi.oninput=function(e){STATE.pudinaB=e.target.value;render();};
+    mpRow.appendChild(h("div",{style:{flex:1}},[h("label",{style:{fontSize:11,color:"#5a7a94",display:"block",marginBottom:5}},"Malli கட்டு"),mi]));
+    mpRow.appendChild(h("div",{style:{flex:1}},[h("label",{style:{fontSize:11,color:"#5a7a94",display:"block",marginBottom:5}},"Pudina மூடை"),pi]));
+    mpWrap.appendChild(mpRow);mpWrap.appendChild(copyBlock(fmtMP(),"mp"));mpc.appendChild(mpWrap);main.appendChild(mpc);
+
+    var fc=h("div",{className:"card"});fc.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"5. Fruits")));fc.appendChild(h("div",{style:{padding:12}},copyBlock(fmtFruits()||"No fruits","fruits")));main.appendChild(fc);
+    var vc=h("div",{className:"card"});vc.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"6. Other Vegetables")));vc.appendChild(h("div",{style:{padding:12}},copyBlock(fmtOther()||"No data","veg")));main.appendChild(vc);
+    var ac=h("div",{className:"card"});ac.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"📋 All Lists")));ac.appendChild(h("div",{style:{padding:12}},copyBlock(allLists(),"all")));main.appendChild(ac);
+  }
+
+  // ─ BRANCHES TAB ─
+  if(STATE.aTab==="branches"){
+    BRANCHES.forEach(function(b){
+      var k=fbKey(STATE.aDate,b);
+      var src=STATE.received[k]||STATE.orders[k]||{};
+      var hasOrd=!!(STATE.orders[k]&&Object.keys(STATE.orders[k]).length);
+      var hasRec=!!(STATE.received[k]&&Object.keys(STATE.received[k]).length);
+      var filled=Object.entries(src).filter(function(e){return e[1]&&String(e[1]).trim();});
+      var bc=h("div",{className:"card"});
+      bc.appendChild(h("div",{className:"card-h"},[
+        h("div",null,[
+          h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},b),
+          h("span",{style:{marginLeft:8}},h("span",{className:"bdg "+(hasRec?"green":hasOrd?"yellow":"red")},hasRec?"✅ Received":hasOrd?"📦 Ordered":"⏳ Pending"))
+        ]),
+        h("button",{className:"bsm",onclick:function(){var k2=fbKey(STATE.aDate,b);STATE.aEntBranch=b;STATE.aEnt=Object.assign({},STATE.orders[k2]||{});STATE.aRec=Object.assign({},STATE.received[k2]||{});setState({aTab:"entry",aEntTab:"order"});}}, "✏️ Edit")
+      ]));
+      if(filled.length>0){
+        var bd=h("div",{style:{padding:"8px 14px"}});
+        filled.forEach(function(e){
+          bd.appendChild(h("div",{style:{display:"flex",justifyContent:"space-between",padding:"4px 0",borderBottom:"1px solid #1a3450",fontSize:12}},[
+            h("span",{style:{color:"#5a7a94"}},e[0]),
+            h("span",{style:{color:"#00d68f",fontWeight:700}},e[1])
+          ]));
+        });
+        bc.appendChild(bd);
+      }
+      main.appendChild(bc);
+    });
+  }
+
+  // ─ COMPARE TAB ─
+  if(STATE.aTab==="compare"){
+    var sc=h("div",{className:"card"});
+    sc.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"Branch Status")));
+    var tbl=h("table",{className:"tbl"});
+    tbl.appendChild(h("thead",null,h("tr",null,["Branch","Items","Status"].map(function(hd){return h("th",null,hd);}))));
+    var tbody=h("tbody");
+    BRANCHES.forEach(function(b){
+      var k=fbKey(STATE.aDate,b);
+      var hasOrd=!!(STATE.orders[k]&&Object.keys(STATE.orders[k]).length);
+      var hasRec=!!(STATE.received[k]&&Object.keys(STATE.received[k]).length);
+      var cnt=hasOrd?Object.keys(STATE.orders[k]).filter(function(v){return STATE.orders[k][v];}).length:0;
+      tbody.appendChild(h("tr",null,[
+        h("td",null,b),
+        h("td",{style:{color:"#00d68f",fontWeight:700}},cnt),
+        h("td",null,h("span",{className:"bdg "+(hasRec?"green":hasOrd?"yellow":"red")},hasRec?"✅ Received":hasOrd?"📦 Ordered":"⏳ Pending"))
+      ]));
+    });
+    tbl.appendChild(tbody);sc.appendChild(tbl);main.appendChild(sc);
+  }
+
+  // ─ BACKUP TAB ─
+  if(STATE.aTab==="backup"){
+    // BACKUP card
+    var bkCard=h("div",{className:"card"});
+    bkCard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"📤 Backup Data")));
+    var bkSec=h("div",{style:{padding:14}});
+    bkSec.appendChild(h("div",{style:{fontSize:12,color:"#5a7a94",marginBottom:12}},"Downloads all data as JSON file. Save to Google Drive for backup."));
+
+    // Backup all data button
+    bkSec.appendChild(h("button",{className:"btn",style:{marginBottom:8},onclick:function(){
+      var backup={
+        exportDate: new Date().toISOString(),
+        orders: STATE.orders||{},
+        received: STATE.received||{},
+        prices: STATE.prices||{},
+        purchasePrices: STATE.purchasePrices||{},
+        expenses: STATE.expenses||{}
+      };
+      var json=JSON.stringify(backup,null,2);
+      var blob=new Blob([json],{type:"application/json"});
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="kkm-backup-"+new Date().toISOString().split("T")[0]+".json";
+      a.click();
+      alert("✅ Backup downloaded!\nSave this file to Google Drive.");
+    }},"📤 Download Full Backup"));
+
+    // Backup today only
+    bkSec.appendChild(h("button",{className:"btn blue",style:{marginBottom:8},onclick:function(){
+      var todayOrders={},todayRec={};
+      BRANCHES.forEach(function(b){
+        var k=fbKey(STATE.aDate,b);
+        if(STATE.orders[k])todayOrders[k]=STATE.orders[k];
+        if(STATE.received[k])todayRec[k]=STATE.received[k];
+      });
+      var backup={
+        exportDate:new Date().toISOString(),
+        date:STATE.aDate,
+        orders:todayOrders,
+        received:todayRec,
+        prices:STATE.prices||{}
+      };
+      var json=JSON.stringify(backup,null,2);
+      var blob=new Blob([json],{type:"application/json"});
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="kkm-backup-"+STATE.aDate+".json";
+      a.click();
+      alert("✅ Today's backup downloaded!");
+    }},"📅 Download Today's Backup ("+STATE.aDate+")"));
+
+    // WhatsApp backup summary
+    bkSec.appendChild(h("button",{className:"btn green",style:{marginBottom:8},onclick:function(){
+      var lines=["📊 *KKM Vegetable Backup*","📅 "+STATE.aDate,"","*Orders:*"];
+      BRANCHES.forEach(function(b){
+        var k=fbKey(STATE.aDate,b);
+        var ord=STATE.orders[k]||{};
+        var items=Object.keys(ord).filter(function(i){return ord[i];});
+        if(items.length>0) lines.push("• "+b+": "+items.length+" items");
+      });
+      lines.push("","*Prices saved:* "+Object.keys(STATE.prices||{}).length+" items");
+      window.open("https://wa.me/?text="+encodeURIComponent(lines.join("\n")),"_blank");
+    }},"💬 Send Summary to WhatsApp"));
+
+    bkCard.appendChild(bkSec);
+    main.appendChild(bkCard);
+
+    // RESTORE card
+    var rsCard=h("div",{className:"card"});
+    rsCard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"📥 Restore Data")));
+    var rsSec=h("div",{style:{padding:14}});
+    rsSec.appendChild(h("div",{style:{fontSize:12,color:"#5a7a94",marginBottom:12}},"⚠️ Restore will merge backup data with existing Firebase data."));
+
+    var fileInp=h("input",{type:"file",accept:".json",style:{display:"none"}});
+    fileInp.onchange=function(e){
+      var file=e.target.files[0];
+      if(!file)return;
+      var reader=new FileReader();
+      reader.onload=function(ev){
+        try{
+          var data=JSON.parse(ev.target.result);
+          if(!data.orders&&!data.prices){alert("❌ Invalid backup file!");return;}
+          if(!confirm("Restore this backup?\nDate: "+(data.exportDate||data.date||"Unknown")+"\n\nThis will merge with existing data."))return;
+          // Restore to Firebase
+          if(data.orders)DB.ref("orders").update(data.orders);
+          if(data.received)DB.ref("received").update(data.received);
+          if(data.prices)DB.ref("prices").update(data.prices);
+          if(data.purchasePrices)DB.ref("v2/purchasePrices").update(data.purchasePrices);
+          if(data.expenses)DB.ref("v2/expenses").update(data.expenses);
+          alert("✅ Restore successful!\nAll data has been restored to Firebase.");
+        }catch(err){alert("❌ Error reading file: "+err.message);}
+      };
+      reader.readAsText(file);
+    };
+    rsSec.appendChild(fileInp);
+    rsSec.appendChild(h("button",{className:"btn orange",onclick:function(){fileInp.click();}},"📥 Select Backup File to Restore"));
+    rsCard.appendChild(rsSec);
+    main.appendChild(rsCard);
+
+    // INFO card
+    var infoCard=h("div",{className:"card"});
+    infoCard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"ℹ️ How to Use")));
+    var infoSec=h("div",{style:{padding:14}});
+    [{t:"Daily Backup",d:"Every day after work, tap 'Download Today's Backup' → save JSON to Google Drive folder 'KKM Backups'"},{t:"Full Backup",d:"Once a week, tap 'Download Full Backup' → save to Google Drive for complete history"},{t:"Restore",d:"If data is lost, open the JSON file from Google Drive → tap 'Select Backup File to Restore'"}].forEach(function(info){
+      infoSec.appendChild(h("div",{style:{marginBottom:12}},[
+        h("div",{style:{fontSize:12,fontWeight:700,color:"#00d68f",marginBottom:4}},"📌 "+info.t),
+        h("div",{style:{fontSize:11,color:"#5a7a94",lineHeight:1.6}},info.d)
+      ]));
+    });
+    infoCard.appendChild(infoSec);
+    main.appendChild(infoCard);
+  }
+
+  // ─ PIN CHANGE TAB ─
+  if(STATE.aTab==="pinchange"){
+    // Branch PINs
+    var bpCard=h("div",{className:"card"});
+    bpCard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"🏪 Branch PINs")));
+
+    BRANCHES.forEach(function(b){
+      var row=h("div",{className:"irow"});
+      row.appendChild(h("span",{style:{flex:1,fontSize:13}},b));
+      var pinInp=h("input",{type:"password",className:"iinp",style:{width:90},value:BRANCH_PINS[b]||"",placeholder:"PIN",maxlength:4});
+      var saveBtn=h("button",{className:"bsm",style:{marginLeft:6},onclick:function(){
+        var newPin=pinInp.value.trim();
+        if(newPin.length!==4||isNaN(newPin)){alert("PIN must be 4 digits!");return;}
+        BRANCH_PINS[b]=newPin;
+        DB.ref("v2/config/branchPins/"+b.replace(/[^a-zA-Z0-9]/g,"_")).set(newPin);
+        alert("✅ PIN changed for "+b);
+      }},"Save");
+      row.appendChild(pinInp);
+      row.appendChild(saveBtn);
+      bpCard.appendChild(row);
+    });
+    main.appendChild(bpCard);
+
+    // Admin PINs
+    var apCard=h("div",{className:"card"});
+    apCard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"🔐 Admin PINs")));
+
+    [{label:"Admin 1 PIN",key:"purchaser"},{label:"Admin 2 PIN",key:"owner"}].forEach(function(admin){
+      var row=h("div",{className:"irow"});
+      row.appendChild(h("span",{style:{flex:1,fontSize:13}},admin.label));
+      var pinInp=h("input",{type:"password",className:"iinp",style:{width:90},placeholder:"New PIN",maxlength:4});
+      var saveBtn=h("button",{className:"bsm",style:{marginLeft:6},onclick:function(){
+        var newPin=pinInp.value.trim();
+        if(newPin.length!==4||isNaN(newPin)){alert("PIN must be 4 digits!");return;}
+        DB.ref("v2/config/adminPins/"+admin.key).set(newPin);
+        if(admin.key==="purchaser") PURCHASER_PIN=newPin;
+        else OWNER_PIN=newPin;
+        pinInp.value="";
+        alert("✅ "+admin.label+" changed!");
+      }},"Save");
+      row.appendChild(pinInp);
+      row.appendChild(saveBtn);
+      apCard.appendChild(row);
+    });
+    main.appendChild(apCard);
+
+    // Info
+    var piCard=h("div",{className:"card"});
+    piCard.appendChild(h("div",{className:"card-h"},h("span",{style:{fontSize:13,fontWeight:700,color:"#00d68f"}},"ℹ️ Info")));
+    piCard.appendChild(h("div",{style:{padding:14,fontSize:12,color:"#5a7a94",lineHeight:1.8}},
+      "• PIN changes take effect immediately\n• All 4 digits required\n• Share new PIN with branch staff via WhatsApp\n• Admin PINs are stored securely in Firebase"
+    ));
+    main.appendChild(piCard);
+  }
+
+  div.appendChild(main);
+  app.appendChild(div);
+}
+
+// ── BILL ──────────────────────────────────────────────────
+function showBill(branch,date,items) {
+  var total=items.reduce(function(a,i){return a+i.amount;},0);
+  var totalQty=items.reduce(function(a,i){return a+pv(i.qty);},0);
+
+  // Format quantity with unit like PDF: "20 Nos" or "2 kg"
+  // Items that are counted in pcs
+  var PCS_ITEMS = ["Mushroom","Baby Corn","Sweet Corn","Kiwi","Strawberry","Pineapple","Watermelon","Muskmelon","Mango","Papaya","Jackfruit","Banana Leaf","Raw Jackfruit","Fig","Pomegranate"];
+  var BORA_ITEMS = ["Cauliflower","Potato","Onion"]; // these can be bora or kg
+
+  function fmtQty(qty, itemName) {
+    var n = pv(qty);
+    if (n===0) return String(qty);
+    var s = String(qty).toLowerCase().trim();
+    // Already has unit — return as is
+    if (s.match(/(kg|bora|pkt|pcs|pic|nos|bag|box|ps|peti|ltr)/)) return String(qty);
+    // Check if it's grams (e.g. 500g or 0.5)
+    if (s.match(/\d+g$/) && !s.match(/kg/)) return String(qty);
+    // Determine unit by item name
+    var iName = (itemName||"").toLowerCase();
+    if (PCS_ITEMS.some(function(p){return p.toLowerCase()===iName;})) return n+" Pcs";
+    if (iName==="cauliflower") return n+" Bora";
+    // Default: kg
+    return n+" kg";
+  }
+
+  var modal=h("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,.93)",zIndex:9999,overflowY:"auto",padding:12}});
+  var box=h("div",{style:{background:"#112236",borderRadius:14,maxWidth:460,margin:"0 auto",border:"1px solid #1a3450",overflow:"hidden"}});
+
+  // Header
+  box.appendChild(h("div",{style:{background:"linear-gradient(135deg,#0a3d2a,#0d1b2a)",padding:"13px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid #1a3450"}},[
+    h("span",{style:{fontSize:14,fontWeight:800,color:"#00d68f"}},"🧾 Bill — "+branch),
+    h("button",{onclick:function(){document.body.removeChild(modal);},style:{background:"none",border:"none",color:"#5a7a94",fontSize:20,cursor:"pointer"}},"✕")
+  ]));
+
+  // Canvas
+  var canvasWrap=h("div",{style:{background:"#e8e8e8",padding:12,display:"flex",justifyContent:"center",overflowX:"auto"}});
+  var canvas=h("canvas",{style:{borderRadius:6,boxShadow:"0 2px 12px rgba(0,0,0,.3)",maxWidth:"100%"}});
+  canvasWrap.appendChild(canvas);box.appendChild(canvasWrap);
+
+  setTimeout(function(){
+    var dpr=window.devicePixelRatio||1,W=440,PAD=16,rowH=26;
+    var toName = branch==="3 Bar" ? "" : "North Chappathi Veg Restaurant";
+    var hH = toName ? 104 : 90; // header height depends on To lines
+    var thH=26,iH=items.length*rowH,fH=80,H=hH+thH+iH+fH;
+    canvas.width=W*dpr;canvas.height=H*dpr;
+    canvas.style.width=W+"px";canvas.style.height=H+"px";
+    var ctx=canvas.getContext("2d");ctx.scale(dpr,dpr);
+
+    // White background
+    ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+
+    // Supplier name - bold large
+    ctx.fillStyle="#111";ctx.font="bold 14px Arial";
+    ctx.fillText(SUPPLIER.name,PAD,22);
+
+    // Address
+    ctx.fillStyle="#444";ctx.font="11px Arial";
+    ctx.fillText(SUPPLIER.address,PAD,38);
+
+    // Date - right side
+    ctx.fillStyle="#111";ctx.font="12px Arial";
+    var ds="Date: "+fmtDate(date);
+    ctx.fillText(ds,W-PAD-ctx.measureText(ds).width,22);
+
+    // To section - right side
+    ctx.fillStyle="#444";ctx.font="11px Arial";
+    ctx.fillText("To",W-PAD-ctx.measureText("To").width,38);
+    if(toName){
+      ctx.fillStyle="#111";ctx.font="11px Arial";
+      ctx.fillText(toName,W-PAD-ctx.measureText(toName).width,52);
+      ctx.font="bold 11px Arial";
+      ctx.fillText(branch,W-PAD-ctx.measureText(branch).width,66);
+      ctx.strokeStyle="#000";ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(PAD,78);ctx.lineTo(W-PAD,78);ctx.stroke();
+    } else {
+      ctx.fillStyle="#111";ctx.font="bold 12px Arial";
+      ctx.fillText(branch,W-PAD-ctx.measureText(branch).width,54);
+      ctx.strokeStyle="#000";ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(PAD,66);ctx.lineTo(W-PAD,66);ctx.stroke();
+    }
+
+    // Table headers
+    var cols=[
+      {l:"NO",      x:PAD,      w:22, r:false},
+      {l:"QUANTITY", x:PAD+26,  w:72, r:false},
+      {l:"ITEM NAME",x:PAD+102, w:152,r:false},
+      {l:"PRICE",   x:PAD+258,  w:52, r:true},
+      {l:"AMOUNT",  x:PAD+314,  w:60, r:true}
+    ];
+    var thY = hH - 8;
+    ctx.fillStyle="#111";ctx.font="bold 10px Arial";
+    cols.forEach(function(c){
+      if(c.r) ctx.fillText(c.l,c.x+c.w-ctx.measureText(c.l).width,thY);
+      else ctx.fillText(c.l,c.x,thY);
+    });
+
+    // Header underline
+    ctx.strokeStyle="#000";ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(PAD,thY+6);ctx.lineTo(W-PAD,thY+6);ctx.stroke();
+
+    // Item rows
+    items.forEach(function(it,i){
+      var y=hH+thH+i*rowH;
+      if(i%2===0){ctx.fillStyle="#f5f5f5";ctx.fillRect(0,y-18,W,rowH);}
+      ctx.fillStyle="#222";ctx.font="11px Arial";
+      var qtyFmt=fmtQty(it.qty,it.name);
+      [
+        {v:String(i+1),  c:cols[0]},
+        {v:qtyFmt,       c:cols[1]},
+        {v:it.name,      c:cols[2]},
+        {v:String(it.price), c:cols[3]},
+        {v:it.amount.toLocaleString("en-IN"), c:cols[4]}
+      ].forEach(function(o){
+        if(o.c.r){ctx.fillText(o.v,o.c.x+o.c.w-ctx.measureText(o.v).width,y);}
+        else{var d=o.v;while(ctx.measureText(d).width>o.c.w-4&&d.length>4)d=d.slice(0,-1);if(d!==o.v)d=d.slice(0,-1)+"…";ctx.fillText(d,o.c.x,y);}
+      });
+    });
+
+    // Footer divider
+    var fy=hH+thH+iH+6;
+    ctx.strokeStyle="#000";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(PAD,fy);ctx.lineTo(W-PAD,fy);ctx.stroke();
+
+    // Total only
+    ctx.fillStyle="#333";ctx.font="11px Arial";
+    ctx.fillText("Total Qty: "+totalQty,PAD,fy+22);
+
+    // TOTAL right side
+    ctx.fillStyle="#111";ctx.font="bold 13px Arial";
+    ctx.fillText("TOTAL",W-PAD-160,fy+22);
+    var tw2=ctx.measureText(total.toLocaleString("en-IN")).width;
+    ctx.fillText(total.toLocaleString("en-IN"),W-PAD-tw2,fy+22);
+
+    // Footer
+    ctx.fillStyle="#333";ctx.font="11px Arial";
+    ctx.fillText("Received by ___________",PAD,H-24);
+    ctx.fillText("Best regards",W-PAD-ctx.measureText("Best regards").width,H-24);
+    ctx.fillStyle="#888";ctx.font="10px Arial";
+    var tw=ctx.measureText("*** Thank You ***").width;
+    ctx.fillText("*** Thank You ***",(W-tw)/2,H-8);
+  },100);
+
+  // Buttons
+  var btns=h("div",{style:{padding:14,display:"flex",flexDirection:"column",gap:8}});
+
+  // WhatsApp
+  btns.appendChild(h("button",{className:"btn green",onclick:function(){
+    var lines=["🧾 *"+SUPPLIER.name+"*","📍 "+SUPPLIER.address,"📅 *"+fmtDate(date)+"*","🏪 *"+(branch==="3 Bar"?branch:"North Chappathi Veg Restaurant - "+branch)+"*","─".repeat(32)];
+    items.forEach(function(it,i){lines.push((i+1)+". "+it.name+" | "+fmtQty(it.qty,it.name)+" | ₹"+it.price+" = ₹"+it.amount.toLocaleString("en-IN"));});
+    lines.push("─".repeat(32));lines.push("Total Qty: "+totalQty);lines.push("*TOTAL: ₹"+total.toLocaleString("en-IN")+"*");
+    window.open("https://wa.me/?text="+encodeURIComponent(lines.join("\n")),"_blank");
+  }},"💬 Send to WhatsApp"));
+
+  // Image + PDF row
+  var row1=h("div",{style:{display:"flex",gap:8}});
+  row1.appendChild(h("button",{className:"btn blue",style:{flex:1},onclick:function(){
+    canvas.toBlob(function(blob){
+      if(!blob)return;
+      var file=new File([blob],"Bill-"+branch+"-"+date+".png",{type:"image/png"});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:"Bill - "+branch}).catch(function(){dlImg();});}else dlImg();
+      function dlImg(){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Bill-"+branch+"-"+date+".png";a.click();}
+    },"image/png");
+  }},"🖼️ Image"));
+  row1.appendChild(h("button",{style:{flex:1,background:"#c0392b",color:"#fff",border:"none",borderRadius:8,padding:"11px",fontWeight:700,cursor:"pointer",fontSize:13},onclick:function(){
+    var rows=items.map(function(it,i){return "<tr><td>"+(i+1)+"</td><td>"+fmtQty(it.qty,it.name)+"</td><td>"+it.name+"</td><td align='right'>"+it.price+"</td><td align='right'>"+it.amount.toLocaleString("en-IN")+"</td></tr>";}).join("");
+    var toLine = branch==="3 Bar" ? "<p><b>"+branch+"</b></p>" : "<p>North Chappathi Veg Restaurant</p><p><b>"+branch+"</b></p>";
+    var html="<!DOCTYPE html><html><head><title>Bill-"+branch+"</title><style>body{font-family:Arial,sans-serif;padding:24px;font-size:12px}h2{font-size:15px;margin:0}p{margin:2px 0}.top{display:flex;justify-content:space-between;margin-bottom:12px}table{width:100%;border-collapse:collapse;margin-top:10px}th{border-top:2px solid #000;border-bottom:2px solid #000;padding:5px 4px;font-size:11px;text-align:left}td{padding:4px;border-bottom:1px solid #ddd;font-size:11px}.sum{margin:4px 0 0 auto;width:220px}.sum td{padding:2px 6px}.sum td:last-child{text-align:right;font-weight:bold}.foot{display:flex;justify-content:space-between;margin-top:24px;font-size:11px}.ty{text-align:center;font-size:10px;color:#888;margin-top:4px}</style></head><body>"
+      +"<div class='top'><div><h2>"+SUPPLIER.name+"</h2><p>"+SUPPLIER.address+"</p></div><div style='text-align:right'><p><b>Date:</b> "+fmtDate(date)+"</p><p>To</p>"+toLine+"</div></div>"
+      +"<table><thead><tr><th>NO</th><th>QUANTITY</th><th>ITEM NAME</th><th align='right'>PRICE</th><th align='right'>AMOUNT</th></tr></thead><tbody>"+rows+"</tbody></table>"
+      +"<p style='margin-top:6px;font-size:11px'>Total Qty: "+totalQty+"</p>"
+      +"<table class='sum'><tr><td><b>TOTAL</b></td><td><b>"+total.toLocaleString("en-IN")+"</b></td></tr></table>"
+      +"<div class='foot'><span>Received by ___________</span><span>Best regards</span></div><div class='ty'>*** Thank You ***</div></body></html>";
+    var w=window.open("","_blank","width=700,height=900");
+    if(!w){alert("Allow popups for PDF");return;}
+    w.document.open();w.document.write(html);w.document.close();
+    setTimeout(function(){w.print();},600);
+  }},"📄 PDF"));
+  btns.appendChild(row1);
+
+  // Copy + Close row
+  var row2=h("div",{style:{display:"flex",gap:8}});
+  var cpBtn=h("button",{className:"btn orange",style:{flex:1},onclick:function(){
+    var lines=[SUPPLIER.name,SUPPLIER.address,"","Date: "+fmtDate(date),"To: "+branch,"","NO   QUANTITY       ITEM NAME             PRICE  AMOUNT","─".repeat(54)];
+    items.forEach(function(it,i){lines.push(String(i+1).padEnd(5)+fmtQty(it.qty,it.name).padEnd(15)+it.name.padEnd(22)+String(it.price).padEnd(7)+it.amount.toLocaleString("en-IN"));});
+    lines.push("─".repeat(54));lines.push("Total Qty: "+totalQty);lines.push("TOTAL    : "+total.toLocaleString("en-IN"));lines.push("");lines.push("*** Thank You ***");
+    navigator.clipboard.writeText(lines.join("\n")).then(function(){cpBtn.textContent="✅ Copied!";setTimeout(function(){cpBtn.textContent="📋 Copy";},2000);});
+  }},"📋 Copy");
+  row2.appendChild(cpBtn);
+  row2.appendChild(h("button",{className:"btn red",style:{flex:1},onclick:function(){document.body.removeChild(modal);}},"✕ Close"));
+  btns.appendChild(row2);
+  box.appendChild(btns);
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+}
+
+// ── START ─────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
